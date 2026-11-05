@@ -122,7 +122,7 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZG6Z7kr6SI6NygcOFItcI3qmbud_XIhOchLChCRhvcrG2J9bTc0W77SDH3MCS9Uv2dQ/exec";
-        const ADMIN_PIN = "123"; // Sesuaikan dengan ADMIN_PASSWORD di Apps Script
+        const ADMIN_PIN = "123";
 
         async function loadData() {
             try {
@@ -131,7 +131,6 @@
 
                 if (result.error) throw new Error(result.error);
 
-                // Ambil data ringkasan dengan fleksibel
                 let summary = result.summary || {};
                 let totalPemasukan = summary['Total Pemasukan'] || summary['Total pemasukan'] || 0;
                 let totalPengeluaran = summary['Total Pengeluaran'] || summary['Total pengeluaran'] || 0;
@@ -141,7 +140,6 @@
                 document.getElementById('totalPengeluaran').innerText = formatRupiah(totalPengeluaran);
                 document.getElementById('saldoAktif').innerText = formatRupiah(saldoAktif);
 
-                // Render Data Mahasiswa
                 let studentHTML = '';
                 if (result.students && result.students.length > 0) {
                     result.students.forEach(s => {
@@ -167,7 +165,6 @@
                 }
                 document.getElementById('studentContainer').innerHTML = studentHTML;
 
-                // Render Log Pengeluaran
                 let expenseHTML = '';
                 if (result.expenses && result.expenses.length > 0) {
                     result.expenses.forEach(e => {
@@ -175,7 +172,7 @@
                             <div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-3 space-y-1">
                                 <div class="flex justify-between items-center text-xs text-slate-400">
                                     <span>📅 ${e.tanggal || '-'}</span>
-                                    <span class="rose-400 text-rose-400 font-semibold">${formatRupiah(e.jumlah)}</span>
+                                    <span class="text-rose-400 font-semibold">${formatRupiah(e.jumlah)}</span>
                                 </div>
                                 <p class="text-sm font-medium text-slate-200">${e.keterangan || '-'}</p>
                             </div>
@@ -193,11 +190,10 @@
             }
         }
 
-        // Fungsi Update Pemasukan Kas Mahasiswa
         async function submitPayment(event) {
             event.preventDefault();
 
-            let inputPin = document.getElementById('mhsNo').value ? prompt("Masukkan Password Admin:") : null;
+            let inputPin = prompt("Masukkan Password Admin:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("Password Admin Salah!");
                 return;
@@ -241,13 +237,12 @@
             }
         }
 
-        // Fungsi Tambah Pengeluaran
         async function submitExpense(event) {
             event.preventDefault();
 
             let inputPin = prompt("Masukkan Password Admin:");
             if (inputPin !== ADMIN_PIN) {
-                alert("Password Admin Salah!");
+                if (inputPin !== null) alert("Password Admin Salah!");
                 return;
             }
 
@@ -298,133 +293,3 @@
     </script>
 </body>
 </html>
-  document.getElementById('studentContainer').innerHTML = studentHTML;
-
-                // Render Log Pengeluaran
-                let expenseHTML = '';
-                if (result.expenses && result.expenses.length > 0) {
-                    result.expenses.forEach(e => {
-                        expenseHTML += `
-                            <div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-3 space-y-1">
-                                <div class="flex justify-between items-center text-xs text-slate-400">
-                                    <span>📅 ${e.tanggal || '-'}</span>
-                                    <span class="text-rose-400 font-semibold">${formatRupiah(e.jumlah)}</span>
-                                </div>
-                                <p class="text-sm font-medium text-slate-200">${e.keterangan || '-'}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    expenseHTML = '<p class="text-xs text-slate-400 text-center py-2">Belum ada data pengeluaran.</p>';
-                }
-                document.getElementById('expenseContainer').innerHTML = expenseHTML;
-
-            } catch (error) {
-                console.error("Gagal memuat data:", error);
-            }
-        }
-
-        // Fungsi Update Pemasukan Kas Mahasiswa
-        async function submitPayment(event) {
-            event.preventDefault();
-
-            let inputPin = prompt("Masukkan PIN Admin untuk memperbarui data kas mahasiswa:");
-            if (inputPin !== ADMIN_PIN) {
-                alert("PIN Salah! Akses ditolak.");
-                return;
-            }
-
-            const btn = document.getElementById('submitPaymentBtn');
-            btn.innerText = "Memperbarui...";
-            btn.disabled = true;
-
-            const no = document.getElementById('mhsNo').value;
-            const bulan = document.getElementById('mhsBulan').value;
-            const nominal = document.getElementById('mhsNominal').value;
-
-            const formData = new URLSearchParams();
-            formData.append('action', 'update_pemasukan');
-            formData.append('no', no);
-            formData.append('bulan', bulan);
-            formData.append('nominal', nominal);
-
-            try {
-                let response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                let result = await response.json();
-                
-                if(result.status === 'success') {
-                    alert('Pemasukan kas mahasiswa berhasil diperbarui!');
-                    document.getElementById('paymentForm').reset();
-                    loadData(); 
-                } else {
-                    alert('Gagal: ' + result.error);
-                }
-            } catch (err) {
-                alert('Terjadi kesalahan koneksi.');
-                console.error(err);
-            } finally {
-                btn.innerText = "Perbarui Pembayaran Kas";
-                btn.disabled = false;
-            }
-        }
-
-        // Fungsi Tambah Pengeluaran
-        async function submitExpense(event) {
-            event.preventDefault();
-
-            let inputPin = prompt("Masukkan PIN Admin untuk menyimpan pengeluaran:");
-            if (inputPin !== ADMIN_PIN) {
-                alert("PIN Salah! Akses ditolak.");
-                return;
-            }
-
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "Menyimpan...";
-            btn.disabled = true;
-
-            const keterangan = document.getElementById('keterangan').value;
-            const jumlah = document.getElementById('jumlah').value;
-            const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-            const formData = new URLSearchParams();
-            formData.append('action', 'tambah_pengeluaran');
-            formData.append('keterangan', keterangan);
-            formData.append('jumlah', jumlah);
-            formData.append('tanggal', tanggal);
-
-            try {
-                let response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                let result = await response.json();
-                
-                if(result.status === 'success') {
-                    alert('Pengeluaran berhasil disimpan!');
-                    document.getElementById('expenseForm').reset();
-                    loadData(); 
-                } else {
-                    alert('Gagal: ' + result.error);
-                }
-            } catch (err) {
-                alert('Terjadi kesalahan koneksi.');
-                console.error(err);
-            } finally {
-                btn.innerText = "Simpan Pengeluaran";
-                btn.disabled = false;
-            }
-        }
-
-        function formatRupiah(angka) {
-            if (!angka && angka !== 0) return 'Rp 0';
-            return 'Rp ' + Number(angka).toLocaleString('id-ID');
-        }
-
-        loadData();
-    </script>
-</body>
-</html>
-w
