@@ -132,9 +132,8 @@
 
                 if (result.error) throw new Error(result.error);
 
-                // Ambil ringkasan secara fleksibel sesuai data JSON Anda
                 let summary = result.summary || {};
-                let totalPemasukan = summary['Total pemasukan dari iuran'] || summary['Total Pemasukan'] || summary['Total pemasukan'] || 100000;
+                let totalPemasukan = summary['Total pemasukan dari iuran'] || summary['Total Pemasukan'] || 100000;
                 let totalPengeluaran = summary['Total pengeluaran'] || summary['Total Pengeluaran'] || 0;
                 let saldoAktif = summary['SALDO KAS'] || summary['Saldo Kas Aktif'] || (totalPemasukan - totalPengeluaran);
 
@@ -142,11 +141,11 @@
                 document.getElementById('totalPengeluaran').innerText = formatRupiah(totalPengeluaran);
                 document.getElementById('saldoAktif').innerText = formatRupiah(saldoAktif);
 
-                // Render Data Mahasiswa
+                // Render Data Mahasiswa dengan aman
                 let studentHTML = '';
                 if (result.students && result.students.length > 0) {
                     result.students.forEach(s => {
-                        let statusText = s.status && s.status.trim() !== '' ? s.status : 'Belum Lunas';
+                        let statusText = s.status ? String(s.status) : 'Belum Lunas';
                         let isLunas = statusText.toLowerCase().includes('lunas') && !statusText.toLowerCase().includes('belum');
                         let badgeColor = isLunas ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border-rose-500/30';
                         
