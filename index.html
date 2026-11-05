@@ -38,7 +38,7 @@
             </div>
         </section>
 
-        <!-- Form Update Pemasukan Kas Mahasiswa (Admin Only) -->
+        <!-- Form Update Pemasukan Kas Mahasiswa -->
         <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow">
             <h2 class="text-sm font-bold text-emerald-400 flex items-center justify-between mb-3">
                 <span>✏️ UPDATE PEMASUKAN KAS</span>
@@ -77,7 +77,7 @@
             </form>
         </section>
 
-        <!-- Form Tambah Pengeluaran (Admin Only) -->
+        <!-- Form Tambah Pengeluaran -->
         <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow">
             <h2 class="text-sm font-bold text-amber-400 flex items-center justify-between mb-3">
                 <span>➕ TAMBAH PENGELUARAN</span>
@@ -126,15 +126,17 @@
 
         async function loadData() {
             try {
-                let response = await fetch(SCRIPT_URL);
-                let result = await response.json();
+                let response = await fetch(SCRIPT_URL, { redirect: "follow" });
+                let textData = await response.text();
+                let result = JSON.parse(textData);
 
                 if (result.error) throw new Error(result.error);
 
+                // Ambil ringkasan secara fleksibel sesuai data JSON Anda
                 let summary = result.summary || {};
-                let totalPemasukan = summary['Total Pemasukan'] || summary['Total pemasukan'] || summary['Total kas masuk dari iuran'] || 100000;
-                let totalPengeluaran = summary['Total Pengeluaran'] || summary['Total pengeluaran'] || summary['Total pengeluaran'] || 0;
-                let saldoAktif = summary['SALDO KAS'] || summary['Saldo Kas Aktif'] || summary['Saldo kas aktif'] || (totalPemasukan - totalPengeluaran);
+                let totalPemasukan = summary['Total pemasukan dari iuran'] || summary['Total Pemasukan'] || summary['Total pemasukan'] || 100000;
+                let totalPengeluaran = summary['Total pengeluaran'] || summary['Total Pengeluaran'] || 0;
+                let saldoAktif = summary['SALDO KAS'] || summary['Saldo Kas Aktif'] || (totalPemasukan - totalPengeluaran);
 
                 document.getElementById('totalPemasukan').innerText = formatRupiah(totalPemasukan);
                 document.getElementById('totalPengeluaran').innerText = formatRupiah(totalPengeluaran);
@@ -144,7 +146,7 @@
                 let studentHTML = '';
                 if (result.students && result.students.length > 0) {
                     result.students.forEach(s => {
-                        let statusText = s.status || 'Belum Lunas';
+                        let statusText = s.status && s.status.trim() !== '' ? s.status : 'Belum Lunas';
                         let isLunas = statusText.toLowerCase().includes('lunas') && !statusText.toLowerCase().includes('belum');
                         let badgeColor = isLunas ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border-rose-500/30';
                         
@@ -187,14 +189,13 @@
 
             } catch (error) {
                 console.error("Gagal memuat data:", error);
-                document.getElementById('studentContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Gagal memuat data mahasiswa.</p>';
-                document.getElementById('expenseContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Gagal memuat pengeluaran.</p>';
+                document.getElementById('studentContainer').innerHTML = `<p class="text-xs text-rose-400 text-center py-2">Gagal: ${error.message}</p>`;
+                document.getElementById('expenseContainer').innerHTML = `<p class="text-xs text-rose-400 text-center py-2">Gagal: ${error.message}</p>`;
             }
         }
 
         async function submitPayment(event) {
             event.preventDefault();
-
             let inputPin = prompt("Masukkan Password Admin:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("Password Admin Salah!");
@@ -205,24 +206,16 @@
             btn.innerText = "Memperbarui...";
             btn.disabled = true;
 
-            const no = document.getElementById('mhsNo').value;
-            const bulan = document.getElementById('mhsBulan').value;
-            const nominal = document.getElementById('mhsNominal').value;
-
             const formData = new URLSearchParams();
             formData.append('action', 'update_pemasukan');
             formData.append('password', ADMIN_PIN);
-            formData.append('no', no);
-            formData.append('bulan', bulan);
-            formData.append('nominal', nominal);
+            formData.append('no', document.getElementById('mhsNo').value);
+            formData.append('bulan', document.getElementById('mhsBulan').value);
+            formData.append('nominal', document.getElementById('mhsNominal').value);
 
             try {
-                let response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+                let response = await fetch(SCRIPT_URL, { method: 'POST', body: formData, redirect: "follow" });
                 let result = await response.json();
-                
                 if(result.status === 'success') {
                     alert('Pemasukan kas berhasil diperbarui!');
                     document.getElementById('paymentForm').reset();
@@ -232,7 +225,6 @@
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');
-                console.error(err);
             } finally {
                 btn.innerText = "Perbarui Pembayaran Kas";
                 btn.disabled = false;
@@ -241,7 +233,6 @@
 
         async function submitExpense(event) {
             event.preventDefault();
-
             let inputPin = prompt("Masukkan Password Admin:");
             if (inputPin !== ADMIN_PIN) {
                 if (inputPin !== null) alert("Password Admin Salah!");
@@ -252,24 +243,18 @@
             btn.innerText = "Menyimpan...";
             btn.disabled = true;
 
-            const keterangan = document.getElementById('keterangan').value;
-            const jumlah = document.getElementById('jumlah').value;
             const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
             const formData = new URLSearchParams();
             formData.append('action', 'tambah_pengeluaran');
             formData.append('password', ADMIN_PIN);
-            formData.append('keterangan', keterangan);
-            formData.append('jumlah', jumlah);
+            formData.append('keterangan', document.getElementById('keterangan').value);
+            formData.append('jumlah', document.getElementById('jumlah').value);
             formData.append('tanggal', tanggal);
 
             try {
-                let response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+                let response = await fetch(SCRIPT_URL, { method: 'POST', body: formData, redirect: "follow" });
                 let result = await response.json();
-                
                 if(result.status === 'success') {
                     alert('Pengeluaran berhasil disimpan!');
                     document.getElementById('expenseForm').reset();
@@ -279,7 +264,6 @@
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');
-                console.error(err);
             } finally {
                 btn.innerText = "Simpan Pengeluaran";
                 btn.disabled = false;
