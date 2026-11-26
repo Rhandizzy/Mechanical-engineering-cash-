@@ -7,76 +7,70 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .tab-content { display: none; animation: fadeIn 0.2s ease-in-out; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
-    <div class="max-w-md mx-auto p-4 space-y-5">
-        
+    <div class="w-full max-w-md mx-auto p-4 space-y-5">
+
         <!-- Header -->
-        <header class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-5 text-center shadow-lg relative">
+        <header class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 text-center shadow-lg">
             <h1 class="text-xl font-bold tracking-wider text-slate-100">MESIN (MALAM)</h1>
             <p class="text-xs text-amber-400 font-medium mt-1">// Cash Flow Monitoring</p>
-            <div id="adminBadge" class="hidden mt-2 inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] px-2.5 py-0.5 rounded-full">
+            <div id="adminBadge" class="hidden mt-2.5 items-center justify-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs px-3 py-1 rounded-full">
                 <span>🔓 Mode Admin Aktif</span>
-                <button onclick="logoutAdmin()" class="underline text-rose-300 hover:text-rose-200 ml-1 font-semibold">Kunci</button>
+                <button type="button" onclick="logoutAdmin()" class="underline text-rose-300 font-semibold">Kunci</button>
             </div>
         </header>
 
-        <!-- ==================== MENU 1: HOME ==================== -->
-        <main id="tab-home" class="tab-content active space-y-5">
-            <!-- Ringkasan Kartu -->
-            <section class="space-y-3">
+        <!-- Banner Status -->
+        <div id="statusBanner" class="hidden bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs rounded-xl p-3"></div>
+
+        <!-- MENU 1: HOME -->
+        <section id="panel-home" class="tab-panel active space-y-5">
+            <div class="space-y-3">
                 <div class="bg-slate-800/90 border-l-4 border-emerald-500 rounded-xl p-4 shadow">
                     <p class="text-xs text-slate-400 uppercase font-semibold">Total Pemasukan</p>
-                    <p id="totalPemasukan" class="text-2xl font-bold text-emerald-400 mt-1">Memuat...</p>
+                    <p id="totalPemasukan" class="text-2xl font-bold text-emerald-400 mt-1">Rp 0</p>
                 </div>
-                
+
                 <div class="bg-slate-800/90 border-l-4 border-rose-500 rounded-xl p-4 shadow">
                     <p class="text-xs text-slate-400 uppercase font-semibold">Total Pengeluaran</p>
-                    <p id="totalPengeluaran" class="text-2xl font-bold text-rose-400 mt-1">Memuat...</p>
+                    <p id="totalPengeluaran" class="text-2xl font-bold text-rose-400 mt-1">Rp 0</p>
                 </div>
-                
+
                 <div class="bg-slate-800/90 border-l-4 border-cyan-500 rounded-xl p-4 shadow">
                     <p class="text-xs text-slate-400 uppercase font-semibold">Saldo Kas Aktif</p>
-                    <p id="saldoAktif" class="text-2xl font-bold text-cyan-400 mt-1">Memuat...</p>
+                    <p id="saldoAktif" class="text-2xl font-bold text-cyan-400 mt-1">Rp 0</p>
                 </div>
-            </section>
+            </div>
 
-            <!-- Log Pengeluaran Kas (Tampil di Home agar transparan) -->
-            <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow">
-                <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2 mb-3">
-                    <span>🛠️</span> RIWAYAT PENGELUARAN KAS
-                </h2>
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-4 shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold text-amber-400">🛠️ RIWAYAT PENGELUARAN KAS</h2>
+                    <button type="button" onclick="loadData()" class="text-xs text-slate-300 bg-slate-900 border border-slate-700 px-2.5 py-1 rounded-lg">Refresh</button>
+                </div>
                 <div id="expenseContainer" class="space-y-2.5">
-                    <p class="text-xs text-slate-400 text-center py-4">Memuat log pengeluaran...</p>
+                    <p class="text-xs text-slate-400 text-center py-3">Memuat riwayat...</p>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
 
-        <!-- ==================== MENU 2: STATUS KAS MAHASISWA ==================== -->
-        <main id="tab-status" class="tab-content space-y-4">
-            <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow space-y-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-sm font-bold text-amber-400 flex items-center gap-2">
-                        <span>📋</span> STATUS KAS MAHASISWA
-                    </h2>
-                    <span id="rekapLunasBadge" class="text-[11px] bg-slate-900 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
-                        Memuat...
-                    </span>
+        <!-- MENU 2: STATUS KAS MAHASISWA -->
+        <section id="panel-status" class="tab-panel space-y-4">
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-4 shadow space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h2 class="text-sm font-bold text-amber-400">📋 STATUS KAS MAHASISWA</h2>
+                    <span id="rekapLunasBadge" class="text-xs bg-slate-900 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">0/33 Lunas</span>
                 </div>
 
-                <!-- Pencarian & Filter -->
                 <div class="flex gap-2">
-                    <input type="text" id="searchMhs" oninput="renderStudents()" placeholder="Cari nama / nomor..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
-                    <select id="filterStatus" onchange="renderStudents()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400">
+                    <input type="text" id="searchMhs" oninput="renderStudents()" placeholder="Cari nama / no..." class="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200">
+                    <select id="filterStatus" onchange="renderStudents()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-slate-200">
                         <option value="all">Semua</option>
                         <option value="lunas">Lunas</option>
                         <option value="belum">Belum Lunas</option>
@@ -84,123 +78,115 @@
                 </div>
 
                 <div id="studentContainer" class="space-y-2.5">
-                    <p class="text-xs text-slate-400 text-center py-4">Memuat data mahasiswa...</p>
+                    <p class="text-xs text-slate-400 text-center py-3">Memuat data mahasiswa...</p>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
 
-        <!-- ==================== MENU 3: UPDATE PEMASUKAN (ADMIN) ==================== -->
-        <main id="tab-pemasukan" class="tab-content space-y-4">
-            <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow">
+        <!-- MENU 3: UPDATE PEMASUKAN (ADMIN) -->
+        <section id="panel-pemasukan" class="tab-panel space-y-4">
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-4 shadow">
                 <h2 class="text-sm font-bold text-emerald-400 flex items-center justify-between mb-4">
                     <span>✏️ UPDATE PEMASUKAN KAS</span>
-                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">Akses Admin</span>
+                    <span class="text-[11px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Admin</span>
                 </h2>
                 <form id="paymentForm" onsubmit="submitPayment(event)" class="space-y-3.5">
                     <div>
-                        <label class="text-xs text-slate-400 block mb-1">Nomor Urut Mahasiswa (No)</label>
-                        <input type="number" id="mhsNo" min="1" max="33" required placeholder="Contoh: 1 sampai 33" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-400">
-                        <p id="previewNamaMhs" class="text-[11px] text-emerald-400 mt-1 hidden"></p>
+                        <label class="text-xs text-slate-400 block mb-1">Nomor Urut Mahasiswa (1 - 33)</label>
+                        <input type="number" id="mhsNo" min="1" max="33" required placeholder="Contoh: 1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200">
+                        <p id="previewNamaMhs" class="text-xs text-emerald-400 mt-1 hidden"></p>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1">Bulan Pembayaran</label>
-                        <select id="mhsBulan" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-400">
+                        <select id="mhsBulan" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200">
                             <option value="" disabled selected>Pilih Bulan</option>
-                            <option value="2026-11">November 2026</option>
-                            <option value="2026-12">Desember 2026</option>
-                            <option value="2027-01">Januari 2027</option>
-                            <option value="2027-02">Februari 2027</option>
-                            <option value="2027-03">Maret 2027</option>
-                            <option value="2027-04">April 2027</option>
-                            <option value="2027-05">Mei 2027</option>
-                            <option value="2027-06">Juni 2027</option>
-                            <option value="2027-07">Juli 2027</option>
-                            <option value="2027-08">Agustus 2027</option>
-                            <option value="2027-09">September 2027</option>
-                            <option value="2027-10">Oktober 2027</option>
-                            <option value="2027-11">November 2027</option>
-                            <option value="2027-12">Desember 2027</option>
+                            <option value="Nov 2026">Nov 2026</option>
+                            <option value="Des 2026">Des 2026</option>
+                            <option value="Jan 2027">Jan 2027</option>
+                            <option value="Feb 2027">Feb 2027</option>
+                            <option value="Mar 2027">Mar 2027</option>
+                            <option value="Apr 2027">Apr 2027</option>
+                            <option value="Mei 2027">Mei 2027</option>
+                            <option value="Jun 2027">Jun 2027</option>
+                            <option value="Jul 2027">Jul 2027</option>
+                            <option value="Agu 2027">Agu 2027</option>
+                            <option value="Sep 2027">Sep 2027</option>
+                            <option value="Okt 2027">Okt 2027</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1">Nominal Bayar (Rp)</label>
-                        <input type="number" id="mhsNominal" required placeholder="Contoh: 25000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-400">
+                        <input type="number" id="mhsNominal" min="1" required placeholder="Contoh: 25000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200">
                     </div>
-                    <button type="submit" id="submitPaymentBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 px-4 rounded-lg text-sm transition shadow">
+                    <button type="submit" id="submitPaymentBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 px-4 rounded-lg text-sm">
                         Perbarui Pembayaran Kas
                     </button>
                 </form>
-            </section>
-        </main>
+            </div>
+        </section>
 
-        <!-- ==================== MENU 4: TAMBAH PENGELUARAN (ADMIN) ==================== -->
-        <main id="tab-pengeluaran" class="tab-content space-y-4">
-            <section class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-4 shadow">
+        <!-- MENU 4: TAMBAH PENGELUARAN (ADMIN) -->
+        <section id="panel-pengeluaran" class="tab-panel space-y-4">
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-4 shadow">
                 <h2 class="text-sm font-bold text-amber-400 flex items-center justify-between mb-4">
                     <span>➕ TAMBAH PENGELUARAN</span>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Akses Admin</span>
+                    <span class="text-[11px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">Admin</span>
                 </h2>
                 <form id="expenseForm" onsubmit="submitExpense(event)" class="space-y-3.5">
                     <div>
                         <label class="text-xs text-slate-400 block mb-1">Keterangan Pengeluaran</label>
-                        <input type="text" id="keterangan" required placeholder="Contoh: Beli Spidol & Amplop" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+                        <input type="text" id="keterangan" required placeholder="Contoh: Beli Spidol" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200">
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1">Jumlah (Rp)</label>
-                        <input type="number" id="jumlah" required placeholder="Contoh: 50000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+                        <input type="number" id="jumlah" min="1" required placeholder="Contoh: 50000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200">
                     </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 px-4 rounded-lg text-sm transition shadow">
+                    <button type="submit" id="submitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 px-4 rounded-lg text-sm">
                         Simpan Pengeluaran
                     </button>
                 </form>
-            </section>
-        </main>
+            </div>
+        </section>
 
     </div>
 
-    <!-- ==================== MODAL PASSWORD ADMIN ==================== -->
-    <div id="adminModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL SANDI ADMIN -->
+    <div id="adminModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xs w-full p-5 shadow-2xl space-y-4">
             <div class="text-center">
-                <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg">
-                    🔒
-                </div>
+                <div class="text-2xl mb-1">🔒</div>
                 <h3 class="text-base font-bold text-slate-100">Akses Khusus Admin</h3>
                 <p class="text-xs text-slate-400 mt-1">Masukkan sandi admin untuk membuka menu ini.</p>
             </div>
             <form onsubmit="verifyAdmin(event)" class="space-y-3">
-                <input type="password" id="adminPasswordInput" placeholder="Masukkan sandi..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-center text-sm tracking-widest text-slate-100 focus:outline-none focus:border-amber-400">
+                <input type="password" id="adminPasswordInput" placeholder="Masukkan sandi..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-center text-sm text-slate-100">
                 <p id="adminErrorMsg" class="text-xs text-rose-400 text-center hidden">Sandi admin salah!</p>
-                <div class="flex gap-2 pt-1">
-                    <button type="button" onclick="closeAdminModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-2 rounded-lg text-xs transition">
-                        Batal
-                    </button>
-                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg text-xs transition">
-                        Buka Akses
-                    </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminModal()" class="flex-1 bg-slate-700 text-slate-200 font-semibold py-2 rounded-lg text-xs">Batal</button>
+                    <button type="submit" class="flex-1 bg-amber-500 text-slate-950 font-bold py-2 rounded-lg text-xs">Masuk</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ==================== BOTTOM NAVIGATION BAR ==================== -->
-    <nav class="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 z-40">
+    <!-- NAVIGASI BAWAH 4 MENU -->
+    <nav class="fixed bottom-0 inset-x-0 bg-slate-900 border-t border-slate-800 z-40">
         <div class="max-w-md mx-auto grid grid-cols-4 gap-1 p-1.5">
-            <button onclick="switchMenu('home')" id="nav-home" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-amber-400 bg-slate-800/80 transition">
+            <button type="button" onclick="switchMenu('home')" id="nav-home" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-amber-400 bg-slate-800">
                 <span class="text-base">🏠</span>
-                <span class="text-[10px] font-semibold mt-0.5">Home</span>
+                <span class="text-[11px] font-semibold mt-0.5">Home</span>
             </button>
-            <button onclick="switchMenu('status')" id="nav-status" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 transition">
+            <button type="button" onclick="switchMenu('status')" id="nav-status" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400">
                 <span class="text-base">📋</span>
-                <span class="text-[10px] font-semibold mt-0.5">Status Kas</span>
+                <span class="text-[11px] font-semibold mt-0.5">Status Kas</span>
             </button>
-            <button onclick="switchMenu('pemasukan')" id="nav-pemasukan" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 transition relative">
+            <button type="button" onclick="switchMenu('pemasukan')" id="nav-pemasukan" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400">
                 <span class="text-base">💰</span>
-                <span class="text-[10px] font-semibold mt-0.5">Pemasukan 🔒</span>
+                <span id="label-pemasukan" class="text-[11px] font-semibold mt-0.5">Pemasukan 🔒</span>
             </button>
-            <button onclick="switchMenu('pengeluaran')" id="nav-pengeluaran" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-slate-200 transition relative">
+            <button type="button" onclick="switchMenu('pengeluaran')" id="nav-pengeluaran" class="nav-btn flex flex-col items-center justify-center py-2 rounded-xl text-slate-400">
                 <span class="text-base">💸</span>
-                <span class="text-[10px] font-semibold mt-0.5">Pengeluaran 🔒</span>
+                <span id="label-pengeluaran" class="text-[11px] font-semibold mt-0.5">Pengeluaran 🔒</span>
             </button>
         </div>
     </nav>
@@ -213,121 +199,149 @@
         let pendingTab = null;
         let allStudents = [];
 
-        // Navigasi Menu & Cek Akses Admin
         function switchMenu(tabName) {
-            const protectedTabs = ['pemasukan', 'pengeluaran'];
-            
-            if (protectedTabs.includes(tabName) && !isAdminAuthenticated) {
+            if ((tabName === 'pemasukan' || tabName === 'pengeluaran') && !isAdminAuthenticated) {
                 pendingTab = tabName;
                 document.getElementById('adminPasswordInput').value = '';
                 document.getElementById('adminErrorMsg').classList.add('hidden');
-                document.getElementById('adminModal').classList.remove('hidden');
-                setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
+                const modal = document.getElementById('adminModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
                 return;
             }
-
             activateTab(tabName);
         }
 
         function activateTab(tabName) {
-            // Sembunyikan semua tab
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Reset style tombol navigasi
+            document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-amber-400', 'bg-slate-800/80');
+                btn.classList.remove('text-amber-400', 'bg-slate-800');
                 btn.classList.add('text-slate-400');
             });
 
-            // Aktifkan tab & tombol terpilih
-            document.getElementById('tab-' + tabName).classList.add('active');
-            const activeBtn = document.getElementById('nav-' + tabName);
-            activeBtn.classList.remove('text-slate-400');
-            activeBtn.classList.add('text-amber-400', 'bg-slate-800/80');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const panel = document.getElementById('panel-' + tabName);
+            const nav = document.getElementById('nav-' + tabName);
+            if (panel) panel.classList.add('active');
+            if (nav) {
+                nav.classList.remove('text-slate-400');
+                nav.classList.add('text-amber-400', 'bg-slate-800');
+            }
+            window.scrollTo(0, 0);
         }
 
         function verifyAdmin(event) {
             event.preventDefault();
-            const input = document.getElementById('adminPasswordInput').value;
-            if (input === ADMIN_PIN) {
+            const val = document.getElementById('adminPasswordInput').value.trim();
+            if (val === ADMIN_PIN) {
                 isAdminAuthenticated = true;
-                document.getElementById('adminModal').classList.add('hidden');
-                document.getElementById('adminBadge').classList.remove('hidden');
-                
-                // Hapus ikon gembok di menu bawah setelah terbuka
-                document.querySelector('#nav-pemasukan span:last-child').innerText = 'Pemasukan';
-                document.querySelector('#nav-pengeluaran span:last-child').innerText = 'Pengeluaran';
+                closeAdminModal();
+                const badge = document.getElementById('adminBadge');
+                badge.classList.remove('hidden');
+                badge.classList.add('inline-flex');
+                document.getElementById('label-pemasukan').innerText = 'Pemasukan';
+                document.getElementById('label-pengeluaran').innerText = 'Pengeluaran';
 
                 if (pendingTab) {
-                    activateTab(pendingTab);
+                    const target = pendingTab;
                     pendingTab = null;
+                    activateTab(target);
                 }
             } else {
                 document.getElementById('adminErrorMsg').classList.remove('hidden');
-                document.getElementById('adminPasswordInput').value = '';
-                document.getElementById('adminPasswordInput').focus();
             }
         }
 
         function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('hidden');
+            const modal = document.getElementById('adminModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
             pendingTab = null;
         }
 
         function logoutAdmin() {
             isAdminAuthenticated = false;
-            document.getElementById('adminBadge').classList.add('hidden');
-            document.querySelector('#nav-pemasukan span:last-child').innerText = 'Pemasukan 🔒';
-            document.querySelector('#nav-pengeluaran span:last-child').innerText = 'Pengeluaran 🔒';
+            const badge = document.getElementById('adminBadge');
+            badge.classList.add('hidden');
+            badge.classList.remove('inline-flex');
+            document.getElementById('label-pemasukan').innerText = 'Pemasukan 🔒';
+            document.getElementById('label-pengeluaran').innerText = 'Pengeluaran 🔒';
             activateTab('home');
         }
 
-        // Preview nama mahasiswa saat mengetik nomor urut di menu Pemasukan
         document.getElementById('mhsNo').addEventListener('input', function() {
             const no = Number(this.value);
             const previewEl = document.getElementById('previewNamaMhs');
             const found = allStudents.find(s => Number(s.no) === no);
             if (found) {
-                previewEl.innerText = `Mahasiswa: ${found.nama} (${found.status || 'Belum Lunas'})`;
+                previewEl.innerText = `${found.nama} (${found.status || 'Belum Lunas'})`;
                 previewEl.classList.remove('hidden');
             } else {
                 previewEl.classList.add('hidden');
             }
         });
 
+        function parseRupiahNumber(val) {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            const cleaned = String(val).replace(/[^0-9-]/g, '');
+            const num = Number(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
         async function loadData() {
+            const banner = document.getElementById('statusBanner');
             try {
-                let response = await fetch(SCRIPT_URL, { redirect: "follow" });
-                let textData = await response.text();
-                let result = JSON.parse(textData);
+                const response = await fetch(SCRIPT_URL, { redirect: "follow" });
+                const textData = await response.text();
+                const result = JSON.parse(textData);
 
                 if (result.error) throw new Error(result.error);
+                banner.classList.add('hidden');
 
-                let summary = result.summary || {};
-                let totalPemasukan = summary['Total pemasukan'] ?? summary['Total pemasukan dari iuran'] ?? summary['Total Pemasukan'] ?? 0;
-                let totalPengeluaran = summary['Total pengeluaran'] ?? summary['Total Pengeluaran'] ?? 0;
-                let saldoAktif = summary['SALDO KAS'] ?? summary['Saldo Kas Aktif'] ?? (totalPemasukan - totalPengeluaran);
+                const summary = result.summary || {};
+                const totalPemasukan = parseRupiahNumber(summary['Total pemasukan'] ?? summary['Total pemasukan dari iuran'] ?? summary['Total Pemasukan'] ?? 0);
+                const totalPengeluaran = parseRupiahNumber(summary['Total pengeluaran'] ?? summary['Total Pengeluaran'] ?? 0);
+                const saldoAktif = summary['SALDO KAS'] !== undefined ? parseRupiahNumber(summary['SALDO KAS']) : (totalPemasukan - totalPengeluaran);
 
                 document.getElementById('totalPemasukan').innerText = formatRupiah(totalPemasukan);
                 document.getElementById('totalPengeluaran').innerText = formatRupiah(totalPengeluaran);
                 document.getElementById('saldoAktif').innerText = formatRupiah(saldoAktif);
 
-                allStudents = result.students || [];
+                allStudents = Array.isArray(result.students) ? result.students : [];
                 renderStudents();
 
-                // Render Log Pengeluaran
-                let expenseHTML = '';
-                if (result.expenses && result.expenses.length > 0) {
-                    result.expenses.forEach(e => {
-                        expenseHTML += `
-                            <div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-3 space-y-1">
-                                <div class="flex justify-between items-center text-xs text-slate-400">
-                                    <span>📅 ${e.tanggal || '-'}</span>
-                                    <span class="text-rose-400 font-semibold">${formatRupiah(e.jumlah)}</span>
-                                </div>
-                                <p class="text-sm font-medium text-slate-200">${e.keterangan || '-'}</p>
+                const expenses = Array.isArray(result.expenses) ? result.expenses : [];
+                if (expenses.length > 0) {
+                    document.getElementById('expenseContainer').innerHTML = expenses.map(e => `
+                        <div class="bg-slate-900/70 border border-slate-700/50 rounded-xl p-3 space-y-1">
+                            <div class="flex justify-between items-center text-xs text-slate-400">
+                                <span>📅 ${e.tanggal || '-'}</span>
+                                <span class="text-rose-400 font-semibold">${formatRupiah(parseRupiahNumber(e.jumlah))}</span>
                             </div>
-                        `;
-                    });
+                            <p class="text-sm font-medium text-slate-200">${e.keterangan || '-'}</p>
+                        </div>
+                    `).join('');
                 } else {
-                    expenseHTML = '<p class="text-xs text
+                    document.getElementById('expenseContainer').innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Belum ada pengeluaran.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                banner.classList.remove('hidden');
+                banner.innerText = 'Gagal memuat data dari Apps Script: ' + error.message;
+                document.getElementById('expenseContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Tidak dapat memuat riwayat.</p>';
+                document.getElementById('studentContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Tidak dapat memuat mahasiswa.</p>';
+            }
+        }
+
+        function renderStudents() {
+            const keyword = (document.getElementById('searchMhs').value || '').toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            let lunasCount = 0;
+            allStudents.forEach(s => {
+                const st = String(s.status || '').toLowerCase();
+                if (st.includes('lunas') && !st.includes('belum')) lunasCount++;
+            });
+            document.getElementById('rekapLunasBadge').innerText = `${lunasCount}/${allStudents.length || 33} Lunas`;
+
+            const 
