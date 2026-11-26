@@ -299,8 +299,8 @@
                 banner.classList.add('hidden');
 
                 const summary = result.summary || {};
-                const totalPemasukan = parseRupiahNumber(summary['Total pemasukan'] ?? summary['Total pemasukan dari iuran'] ?? summary['Total Pemasukan'] ?? 0);
-                const totalPengeluaran = parseRupiahNumber(summary['Total pengeluaran'] ?? summary['Total Pengeluaran'] ?? 0);
+                const totalPemasukan = parseRupiahNumber(summary['Total pemasukan'] ?? summary['Total pemasukan dari iuran'] ?? 0);
+                const totalPengeluaran = parseRupiahNumber(summary['Total pengeluaran'] ?? 0);
                 const saldoAktif = summary['SALDO KAS'] !== undefined ? parseRupiahNumber(summary['SALDO KAS']) : (totalPemasukan - totalPengeluaran);
 
                 document.getElementById('totalPemasukan').innerText = formatRupiah(totalPemasukan);
@@ -327,7 +327,7 @@
             } catch (error) {
                 console.error(error);
                 banner.classList.remove('hidden');
-                banner.innerText = 'Gagal memuat data dari Apps Script: ' + error.message;
+                banner.innerText = 'Gagal memuat data: ' + error.message;
                 document.getElementById('expenseContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Tidak dapat memuat riwayat.</p>';
                 document.getElementById('studentContainer').innerHTML = '<p class="text-xs text-rose-400 text-center py-2">Tidak dapat memuat mahasiswa.</p>';
             }
@@ -344,4 +344,5 @@
             });
             document.getElementById('rekapLunasBadge').innerText = `${lunasCount}/${allStudents.length || 33} Lunas`;
 
-            const 
+            const filtered = allStudents.filter(s => {
+                const matchText = String(s
