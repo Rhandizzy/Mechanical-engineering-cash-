@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesin (Malam) - Cash Flow Monitoring</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      padding: 0 0 88px 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .container {
+      width: 100%;
+      max-width: 448px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .header-card { text-align: center; padding: 20px 16px; }
+    .header-card h1 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+    .header-card p { margin: 4px 0 0; font-size: 12px; color: #fbbf24; font-weight: 600; }
+
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-left-width: 4px;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .stat-emerald { border-left-color: #10b981; }
+    .stat-rose { border-left-color: #f43f5e; }
+    .stat-cyan { border-left-color: #06b6d4; }
+    .stat-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin: 0; }
+    .stat-value { font-size: 22px; font-weight: 700; margin: 6px 0 0; }
+    .text-emerald { color: #34d399; }
+    .text-rose { color: #fb7185; }
+    .text-cyan { color: #22d3ee; }
+    .text-amber { color: #fbbf24; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+    }
+    .btn-sm {
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .item-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .item-sub { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+    .badge-lunas {
+      background: rgba(16,185,129,0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(16,185,129,0.4);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .badge-belum {
+      background: rgba(244,63,94,0.2);
+      color: #fda4af;
+      border: 1px solid rgba(244,63,94,0.4);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+    .form-control {
+      width: 100%;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .helper-box {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #a7f3d0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+      line-height: 1.45;
+    }
+    .btn-primary-green {
+      width: 100%;
+      background: #10b981;
+      color: #052e16;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-primary-amber {
+      width: 100%;
+      background: #f59e0b;
+      color: #271700;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .banner-err {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.45);
+      color: #fde68a;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+      word-break: break-word;
+    }
+
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0b1120;
+      border-top: 1px solid #1e293b;
+      z-index: 999;
+    }
+    .nav-grid {
+      max-width: 448px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 6px;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-family: inherit;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn.active {
+      background: #1e293b;
+      color: #fbbf24;
+    }
+    .nav-ico { font-size: 16px; line-height: 1.1; pointer-events: none; }
+    .nav-txt { font-size: 11px; font-weight: 600; pointer-events: none; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 2000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 320px;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+    }
+    .modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-cancel {
+      flex: 1;
+      background: #334155;
+      color: #f8fafc;
+      border: none;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-ok {
+      flex: 1;
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .admin-pill {
+      display: none;
+      margin-top: 10px;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.4);
+      color: #6ee7b7;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      gap: 8px;
+      align-items: center;
+    }
+    .admin-pill.show { display: inline-flex; }
+    .lock-link { background: none; border: none; color: #fda4af; text-decoration: underline; font-size: 12px; cursor: pointer; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card header-card">
+      <h1>MESIN (MALAM)</h1>
+      <p>// Cash Flow Monitoring</p>
+      <div id="adminPill" class="admin-pill">
+        <span>🔓 Admin Aktif</span>
+        <button type="button" id="btnLockAdmin" class="lock-link">Kunci</button>
+      </div>
+    </div>
+
+    <div id="errBanner" class="banner-err"></div>
+
+    <!-- 1. HOME -->
+    <div id="panel-home" class="view-panel active">
+      <div class="stat-card stat-emerald">
+        <p class="stat-label">Total Pemasukan</p>
+        <p id="valPemasukan" class="stat-value text-emerald">Memuat...</p>
+      </div>
+      <div class="stat-card stat-rose">
+        <p class="stat-label">Total Pengeluaran</p>
+        <p id="valPengeluaran" class="stat-value text-rose">Memuat...</p>
+      </div>
+      <div class="stat-card stat-cyan">
+        <p class="stat-label">Saldo Kas Aktif</p>
+        <p id="valSaldo" class="stat-value text-cyan">Memuat...</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span class="text-amber">🛠️ RIWAYAT PENGELUARAN KAS</span>
+          <button type="button" id="btnRefreshData" class="btn-sm">Refresh</button>
+        </div>
+        <div id="expenseList">
+          <p style="font-size:12px;color:#94a3b8;text-align:center;">Memuat riwayat...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. STATUS KAS MAHASISWA -->
+    <div id="panel-status" class="view-panel">
+      <div class="card">
+        <div class="section-title">
+          <span class="text-amber">📋 STATUS KAS MAHASISWA</span>
+          <span id="rekapLunas" style="font-size:12px;color:#cbd5e1;background:#0f172a;padding:4px 8px;border-radius:8px;border:1px solid #334155;">0/33 Lunas</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="cariNama" class="form-control" style="flex:1;" placeholder="Cari nama / no..." />
+          <select id="filterLunas" class="form-control" style="width:auto;">
+            <option value="all">Semua</option>
+            <option value="lunas">Lunas</option>
+            <option value="belum">Belum Lunas</option>
+          </select>
+        </div>
+        <div id="studentList">
+          <p style="font-size:12px;color:#94a3b8;text-align:center;">Memuat data mahasiswa...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. UPDATE PEMASUKAN (ADMIN) -->
+    <div id="panel-pemasukan" class="view-panel">
+      <div class="card">
+        <div class="section-title">
+          <span class="text-emerald">✏️ UPDATE PEMASUKAN KAS</span>
+          <span class="badge-lunas">Admin</span>
+        </div>
+        <form id="formPemasukan">
+          <div class="form-group">
+            <label>Nomor Urut Mahasiswa (1 - 33)</label>
+            <input type="number" id="inputNo" class="form-control" min="1" max="33" required placeholder="Contoh: 1" />
+            <div id="previewMhs" style="font-size:12px;color:#34d399;margin-top:4px;"></div>
+          </div>
+          <div class="form-group">
+            <label>Mulai Dari Bulan</label>
+            <select id="inputBulan" class="form-control" required>
+              <option value="" disabled selected>Pilih Bulan Awal</option>
+              <option value="Nov 2026">Nov 2026</option>
+              <option value="Des 2026">Des 2026</option>
+              <option value="Jan 2027">Jan 2027</option>
+              <option value="Feb 2027">Feb 2027</option>
+              <option value="Mar 2027">Mar 2027</option>
+              <option value="Apr 2027">Apr 2027</option>
+              <option value="Mei 2027">Mei 2027</option>
+              <option value="Jun 2027">Jun 2027</option>
+              <option value="Jul 2027">Jul 2027</option>
+              <option value="Agu 2027">Agu 2027</option>
+              <option value="Sep 2027">Sep 2027</option>
+              <option value="Okt 2027">Okt 2027</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Total Nominal Bayar (Rp) — bisa langsung beberapa bulan</label>
+            <input type="number" id="inputNominal" class="form-control" min="1" step="500" required placeholder="Contoh: 100000 (untuk 4 bulan)" />
+          </div>
+          <div id="allocPreview" class="helper-box"></div>
+          <button type="submit" id="btnSimpanPemasukan" class="btn-primary-green">Perbarui Pembayaran Kas</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4. TAMBAH PENGELUARAN (ADMIN) -->
+    <div id="panel-pengeluaran" class="view-panel">
+      <div class="card">
+        <div class="section-title">
+          <span class="text-amber">➕ TAMBAH PENGELUARAN</span>
+          <span class="badge-belum">Admin</span>
+        </div>
+        <form id="formPengeluaran">
+          <div class="form-group">
+            <label>Keterangan Pengeluaran</label>
+            <input type="text" id="inputKet" class="form-control" required placeholder="Contoh: Beli Spidol" />
+          </div>
+          <div class="form-group">
+            <label>Jumlah (Rp)</label>
+            <input type="number" id="inputJumlah" class="form-control" min="1" required placeholder="Contoh: 50000" />
+          </div>
+          <button type="submit" id="btnSimpanPengeluaran" class="btn-primary-amber">Simpan Pengeluaran</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SANDI ADMIN -->
+  <div id="pinModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="font-size:26px;">🔒</div>
+      <h3 style="margin:6px 0 4px;font-size:16px;">Akses Khusus Admin</h3>
+      <p style="margin:0 0 12px;font-size:12px;color:#94a3b8;">Masukkan sandi admin untuk membuka menu ini.</p>
+      <form id="formPinAdmin">
+        <input type="password" id="pinInput" class="form-control" style="text-align:center;" required placeholder="Masukkan sandi..." />
+        <p id="pinErr" style="display:none;color:#fb7185;font-size:12px;margin:6px 0 0;">Sandi admin salah!</p>
+        <div class="modal-actions">
+          <button type="button" id="btnBatalPin" class="btn-cancel">Batal</button>
+          <button type="submit" class="btn-ok">Masuk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NAVIGASI BAWAH 4 MENU -->
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-grid">
+      <button type="button" id="tab-home" data-menu="home" class="nav-btn active">
+        <span class="nav-ico">🏠</span>
+        <span class="nav-txt">Home</span>
+      </button>
+      <button type="button" id="tab-status" data-menu="status" class="nav-btn">
+        <span class="nav-ico">📋</span>
+        <span class="nav-txt">Status Kas</span>
+      </button>
+      <button type="button" id="tab-pemasukan" data-menu="pemasukan" class="nav-btn">
+        <span class="nav-ico">💰</span>
+        <span id="navTextPemasukan" class="nav-txt">Pemasukan 🔒</span>
+      </button>
+      <button type="button" id="tab-pengeluaran" data-menu="pengeluaran" class="nav-btn">
+        <span class="nav-ico">💸</span>
+        <span id="navTextPengeluaran" class="nav-txt">Pengeluaran 🔒</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZG6Z7kr6SI6NygcOFItcI3qmbud_XIhOchLChCRhvcrG2J9bTc0W77SDH3MCS9Uv2dQ/exec";
+      var ADMIN_PIN = "123";
+      var IURAN_PER_BULAN = 25000;
+      var BULAN_LIST = [
+        "Nov 2026", "Des 2026", "Jan 2027", "Feb 2027", "Mar 2027", "Apr 2027",
+        "Mei 2027", "Jun 2027", "Jul 2027", "Agu 2027", "Sep 2027", "Okt 2027"
+      ];
+
+      var adminUnlocked = false;
+      var pendingMenu = null;
+      var studentsData = [];
+
+      function showErr(msg) {
+        var b = document.getElementById("errBanner");
+        if (b) {
+          b.style.display = "block";
+          b.textContent = msg;
+        }
+      }
+
+      window.addEventListener("error", function(ev) {
+        showErr("JS Error: " + (ev.message || "Unknown"));
+      });
+
+      function showPanel(name) {
+        var panels = document.querySelectorAll(".view-panel");
+        for (var i = 0; i < panels.length; i++) {
+          panels[i].classList.remove("active");
+        }
+        var tabs = document.querySelectorAll(".nav-btn");
+        for (var j = 0; j < tabs.length; j++) {
+          tabs[j].classList.remove("active");
+        }
+        var p = document.getElementById("panel-" + name);
+        var t = document.getElementById("tab-" + name);
+        if (p) p.classList.add("active");
+        if (t) t.classList.add("active");
+        window.scrollTo(0, 0);
+      }
+
+      function selectTab(name) {
+        if ((name === "pemasukan" || name === "pengeluaran") && !adminUnlocked) {
+          pendingMenu = name;
+          document.getElementById("pinInput").value = "";
+          document.getElementById("pinErr").style.display = "none";
+          document.getElementById("pinModal").classList.add("open");
+          return;
+        }
+        showPanel(name);
+      }
+
+      function closePinModal() {
+        document.getElementById("pinModal").classList.remove("open");
+        pendingMenu = null;
+      }
+
+      function parseAmt(v) {
+        if (typeof v === "number") return isNaN(v) ? 0 : v;
+        if (!v) return 0;
+        var n = Number(String(v).replace(/[^0-9-]/g, ""));
+        return isNaN(n) ? 0 : n;
+      }
+
+      function rupiah(v) {
+        return "Rp " + parseAmt(v).toLocaleString("id-ID");
+      }
+
+      function updateAllocationPreview() {
+        var bulanAwal = document.getElementById("inputBulan").value;
+        var nominal = parseAmt(document.getElementById("inputNominal").value);
+        var box = document.getElementById("allocPreview");
+
+        if (!bulanAwal || nominal <= 0) {
+          box.style.display = "none";
+          box.innerHTML = "";
+          return;
+        }
+
+        var startIdx = BULAN_LIST.indexOf(bulanAwal);
+        if (startIdx === -1) {
+          box.style.display = "none";
+          return;
+        }
+
+        var fullMonths = Math.floor(nominal / IURAN_PER_BULAN);
+        var remainder = nominal % IURAN_PER_BULAN;
+        var parts = [];
+        var idx = startIdx;
+
+        for (var m = 0; m < fullMonths && idx < BULAN_LIST.length; m++, idx++) {
+          parts.push(BULAN_LIST[idx] + " (" + rupiah(IURAN_PER_BULAN) + ")");
+        }
+        if (remainder > 0 && idx < BULAN_LIST.length) {
+          parts.push(BULAN_LIST[idx] + " (" + rupiah(remainder) + " sisa)");
+        }
+
+        var ketBulan = fullMonths > 0
+          ? "Setara <strong>" + fullMonths + " bulan</strong>" + (remainder > 0 ? " + sisa " + rupiah(remainder) : "")
+          : "Pembayaran sebagian (" + rupiah(remainder) + ")";
+
+        box.style.display = "block";
+        box.innerHTML = "<div>" + ketBulan + " @ " + rupiah(IURAN_PER_BULAN) + "/bln</div>" +
+          (parts.length > 0 ? "<div style="margin-top:4px;color:#6ee7b7;">Alokasi: " + parts.join(" → ") + "</div>" : "");
+      }
+
+      function renderStudentList() {
+        var q = (document.getElementById("cariNama").value || "").toLowerCase();
+        var flt = document.getElementById("filterLunas").value;
+        var lunasCount = 0;
+
+        for (var i = 0; i < studentsData.length; i++) {
+          var st = String(studentsData[i].status || "").toLowerCase();
+          if (st.indexOf("lunas") !== -1 && st.indexOf("belum") === -1) lunasCount++;
+        }
+        document.getElementById("rekapLunas").textContent = lunasCount + "/" + (studentsData.length || 33) + " Lunas";
+
+        var html = "";
+        var shown = 0;
+        for (var j = 0; j < studentsData.length; j++) {
+          var s = studentsData[j];
+          var match = String(s.nama || "").toLowerCase().indexOf(q) !== -1 || String(s.no || "").indexOf(q) !== -1;
+          var stText = s.status ? String(s.status) : "Belum Lunas";
+          var stLow = stText.toLowerCase();
+          var isLunas = stLow.indexOf("lunas") !== -1 && stLow.indexOf("belum") === -1;
+
+          if (!match) continue;
+          if (flt === "lunas" && !isLunas) continue;
+          if (flt === "belum" && isLunas) continue;
+
+          shown++;
+          var badgeClass = isLunas ? "badge-lunas" : "badge-belum";
+          var tung = parseAmt(s.kekurangan);
+          html += '<div class="item-box">' +
+            '<div class="item-top">' +
+            '<span style="font-size:14px;font-weight:600;">' + s.no + '. ' + s.nama + '</span>' +
+            '<span class="' + badgeClass + '">' + stText + '</span>' +
+            '</div>' +
+            '<div class="item-sub">' +
+            '<span>Dibayar: <strong>' + rupiah(s.totalDibayar) + '</strong></span>' +
+            '<span>Tunggakan: <strong class="' + (tung > 0 ? "text-rose" : "") + '">' + rupiah(tung) + '</strong></span>' +
+            '</div>' +
+            '</div>';
+        }
+
+        document.getElementById("studentList").innerHTML = shown > 0
+          ? html
+          : '<p style="font-size:12px;color:#94a3b8;text-align:center;">Data tidak ditemukan.</p>';
+      }
+
+      function fetchCashData() {
+        var banner = document.getElementById("errBanner");
+        fetch(SCRIPT_URL, { redirect: "follow" })
+          .then(function(r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.text();
+          })
+          .then(function(txt) {
+            var res = JSON.parse(txt);
+            if (res.error) throw new Error(res.error);
+            banner.style.display = "none";
+
+            var sum = res.summary || {};
+            var tarif = parseAmt(sum["luran per orang per bulan"] || sum["Iuran per orang per bulan"] || 25000);
+            if (tarif > 0) IURAN_PER_BULAN = tarif;
+
+            var masuk = parseAmt(sum["Total pemasukan"] || sum["Total pemasukan dari iuran"] || 0);
+            var keluar = parseAmt(sum["Total pengeluaran"] || 0);
+            var saldo = sum["SALDO KAS"] !== undefined ? parseAmt(sum["SALDO KAS"]) : (masuk - keluar);
+
+            document.getElementById("valPemasukan").textContent = rupiah(masuk);
+            document.getElementById("valPengeluaran").textContent = rupiah(keluar);
+            document.getElementById("valSaldo").textContent = rupiah(saldo);
+
+            studentsData = Array.isArray(res.students) ? res.students : [];
+            renderStudentList();
+            updateAllocationPreview();
+
+            var exps = Array.isArray(res.expenses) ? res.expenses : [];
+            if (exps.length > 0) {
+              var html = "";
+              for (var i = 0; i < exps.length; i++) {
+                html += '<div class="item-box">' +
+                  '<div class="item-top" style="font-size:12px;color:#94a3b8;">' +
+                  '<span>📅 ' + (exps[i].tanggal || "-") + '</span>' +
+                  '<span class="text-rose" style="font-weight:700;">' + rupiah(exps[i].jumlah) + '</span>' +
+                  '</div>' +
+                  '<div style="font-size:14px;font-weight:600;margin-top:4px;">' + (exps[i].keterangan || "-") + '</div>' +
+                  '</div>';
+              }
+              document.getElementById("expenseList").innerHTML = html;
+            } else {
+              document.getElementById("expenseList").innerHTML = '<p style="font-size:12px;color:#94a3b8;text-align:center;">Belum ada pengeluaran.</p>';
+            }
+          })
+          .catch(function(err) {
+            showErr("Gagal memuat data: " + err.message);
+            document.getElementById("valPemasukan").textContent = "Rp 0";
+            document.getElementById("valPengeluaran").textContent = "Rp 0";
+            document.getElementById("valSaldo").textContent = "Rp 0";
+            document.getElementById("expenseList").innerHTML = '<p style="font-size:12px;color:#fb7185;text-align:center;">Gagal memuat riwayat.</p>';
+            document.getElementById("studentList").innerHTML = '<p style="font-size:12px;color:#fb7185;text-align:center;">Gagal memuat data mahasiswa.</p>';
+          });
+      }
+
+      var navBtns = document.querySelectorAll(".nav-btn");
+      for (var k = 0; k < navBtns.length; k++) {
+        navBtns[k].addEventListener("click", function() {
+          var menu = this.getAttribute("data-menu");
+          if (menu) selectTab(menu);
+        });
+      }
+
+      document.getElementById("btnRefreshData").addEventListener("click", fetchCashData);
+      document.getElementById("cariNama").addEventListener("input", renderStudentList);
+      document.getElementById("filterLunas").addEventListener("change", renderStudentList);
+
+      document.getElementById("btnBatalPin").addEventListener("click", closePinModal);
+      document.getElementById("btnLockAdmin").addEventListener("click", function() {
+        adminUnlocked = false;
+        document.getElementById("adminPill").classList.remove("show");
+        document.getElementById("navTextPemasukan").textContent = "Pemasukan 🔒";
+        document.getElementById("navTextPengeluaran").textContent = "Pengeluaran 🔒";
+        showPanel("home");
+      });
+
+      document.getElementById("formPinAdmin").addEventListener("submit", function(e) {
+        e.preventDefault();
+        var val = document.getElementById("pinInput").value.trim();
+        if (val === ADMIN_PIN) {
+          adminUnlocked = true;
+          closePinModal();
+          document.getElementById("adminPill").classList.add("show");
+          document.getElementById("navTextPemasukan").textContent = "Pemasukan";
+          document.getElementById("navTextPengeluaran").textContent = "Pengeluaran";
+          if (pendingMenu) {
+            var target = pendingMenu;
+            pendingMenu = null;
+            showPanel(target);
+          }
+        } else {
+          document.getElementById("pinErr").style.display = "block";
+        }
+      });
+
+      document.getElementById("inputNo").addEventListener("input", function() {
+        var no = Number(this.value);
+        var box = document.getElementById("previewMhs");
+        for (var i = 0; i < studentsData.length; i++) {
+          if (Number(studentsData[i].no) === no) {
+            box.textContent = studentsData[i].nama + " (" + (studentsData[i].status || "Belum Lunas") + ")";
+            return;
+          }
+        }
+        box.textContent = "";
+      });
+
+      document.getElementById("inputBulan").addEventListener("change", updateAllocationPreview);
+      document.getElementById("inputNominal").addEventListener("input", updateAllocationPreview);
+
+      document.getElementById("formPemasukan").addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (!adminUnlocked) return selectTab("pemasukan");
+        var btn = document.getElementById("btnSimpanPemasukan");
+        btn.textContent = "Memperbarui...";
+        btn.disabled = true;
+
+        var body = new URLSearchParams();
+        body.append("action", "update_pemasukan");
+        body.append("password", ADMIN_PIN);
+        body.append("no", document.getElementById("inputNo").value);
+        body.append("bulan", document.getElementById("inputBulan").value);
+        body.append("nominal", document.getElementById("inputNominal").value);
+
+        fetch(SCRIPT_URL, { method: "POST", body: body, redirect: "follow" })
+          .then(function(r) { return r.json(); })
+          .then(function(res) {
+            if (res.status === "success") {
+              alert(res.message || "Pemasukan kas berhasil diperbarui!");
+              document.getElementById("formPemasukan").reset();
+              document.getElementById("previewMhs").textContent = "";
+              document.getElementById("allocPreview").style.display = "none";
+              fetchCashData();
+            } else {
+              alert("Gagal: " + (res.error || "Terjadi kesalahan"));
+            }
+          })
+          .catch(function() { alert("Terjadi kesalahan koneksi."); })
+          .finally(function() {
+            btn.textContent = "Perbarui Pembayaran Kas";
+            btn.disabled = false;
+          });
+      });
+
+      document.getElementById("formPengeluaran").addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (!adminUnlocked) return selectTab("pengeluaran");
+        var btn = document.getElementById("btnSimpanPengeluaran");
+        btn.textContent = "Menyimpan...";
+        btn.disabled = true;
+
+        var now = new Date();
+        var tgl = now.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) +
+          " " + now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+        var body = new URLSearchParams();
+        body.append("action", "tambah_pengeluaran");
+        body.append("password", ADMIN_PIN);
+        body.append("keterangan", document.getElementById("inputKet").value);
+        body.append("jumlah", document.getElementById("inputJumlah").value);
+        body.append("tanggal", tgl);
+
+        fetch(SCRIPT_URL, { method: "POST", body: body, redirect: "follow" })
+          .then(function(r) { return r.json(); })
+          .then(function(res) {
+            if (res.status === "success") {
+              alert("Pengeluaran berhasil disimpan!");
+              document.getElementById("formPengeluaran").reset();
+              fetchCashData();
+            } else {
+              alert("Gagal: " + (res.error || "Terjadi kesalahan"));
+            }
+          })
+          .catch(function() { alert("Terjadi kesalahan koneksi."); })
+          .finally(function() {
+            btn.textContent = "Simpan Pengeluaran";
+            btn.disabled = false;
+          });
+      });
+
+      fetchCashData();
+    })();
+  </script>
+</body>
+</html>
